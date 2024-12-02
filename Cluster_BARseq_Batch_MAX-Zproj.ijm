@@ -14,6 +14,9 @@ File.makeDirectory(output1);
 output2=output1 + File.separator + outFolder
 File.makeDirectory(output2);
 
+// load BF macro extensions to open images in headless mode
+run("Bio-Formats Macro Extensions");
+
 processFolder(input);
 
 // function to scan folders/subfolders/files to find files with correct suffix
@@ -36,16 +39,16 @@ function processFile(input, file) {
 
 	if(matches(file, ".*640nm_775em, 640nm, 561nm, 514nm_555em.*")) {
 		print(file);
-		run("Bio-Formats Importer", "open=["+input + File.separator + file +"]");
-		name=File.nameWithoutExtension;
-		namesplit= split(name, "_");
-		shortname= namesplit[2]+"-"+namesplit[3]+"-"+namesplit[8];
+		Ext.openImagePlus(input + File.separator + file);
+		namesplit= split(file, "_");
+		lastSplit= split(namesplit[namesplit.length-1], ".");
+		shortname= namesplit[2]+"-"+namesplit[3]+"-"+lastSplit[0];
 		run("Z Project...", "projection=[Max Intensity]");
 		saveAs("Tiff", output2 + "/MAX_" + shortname + ".tif");
 		close('*');
 	}
 }
 
-print("Done\n");
+print("\nDone!\n");
 print("Your MAX-Z projected files are in: " + output2 + ".\n");
-print("Move on to synchronize your local processed folder (within /data/Reto/BARseqTransfer) with the folder on the cluster.");
+print("Copy the folder holding the MAX images onto the SPIM network folder for backup. Before BARseq processing rsynch the files to the /data/Reto/BARseqTransfer folder on the Linux machine.");
