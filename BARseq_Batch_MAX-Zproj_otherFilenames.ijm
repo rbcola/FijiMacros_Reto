@@ -4,16 +4,21 @@
 
 
 #@ File (label = "Input directory", style = "directory") input
+#@ File (label = "Output directory", style = "directory") output
 #@ String (label = "File suffix", value = ".vsi") suffix
 #@ String (label = "channels string", value = "640nm_775em, 640nm, 561nm, 514nm_555em") acq
 #@ String (label = "geneseq name", value = "geneseq01") outFolder
+#@ String (label = "filename", value = "Ab01_FOV67") fname
 
 
 // See also Process_Folder.py for a version of this code
 // in the Python scripting language.
-output1 = input + File.separator + "MAXprojected"
+/*output1 = input + File.separator + "MAXprojected"
 File.makeDirectory(output1);
 output2=output1 + File.separator + outFolder
+File.makeDirectory(output2);
+*/
+output2 = output + File.separator + outFolder
 File.makeDirectory(output2);
 
 processFolder(input);
@@ -39,11 +44,12 @@ function processFile(input, file) {
 	if(matches(file, ".*"+acq+".*")) {
 		print(file);
 		run("Bio-Formats Importer", "open=["+input + File.separator + file +"]");
-		name=File.nameWithoutExtension;
+		/*name=File.nameWithoutExtension;
 		namesplit= split(name, "_");
-		shortname= namesplit[2]+"-"+namesplit[3]+"-"+namesplit[8];
+		Array.print(namesplit);
+		shortname= namesplit[4]+"-"+namesplit[7];*/
 		run("Z Project...", "projection=[Max Intensity]");
-		saveAs("Tiff", output2 + "/MAX_" + shortname + ".tif");
+		saveAs("Tiff", output2 + "/MAX_" + fname + ".tif");
 		close('*');
 	}
 }

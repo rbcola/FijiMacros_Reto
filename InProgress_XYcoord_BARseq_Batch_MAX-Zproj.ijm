@@ -5,7 +5,7 @@
 
 #@ File (label = "Input directory", style = "directory") input
 #@ String (label = "File suffix", value = ".vsi") suffix
-#@ String (label = "channels string", value = "640nm_775em, 640nm, 561nm, 514nm_555em") acq
+#@ String (label = "Acq. setting pattern", value = ".*514nm_555em, 640nm_775em, 640nm, 561nm.*") AcqPattern
 #@ String (label = "geneseq name", value = "geneseq01") outFolder
 
 
@@ -15,6 +15,8 @@ output1 = input + File.separator + "MAXprojected"
 File.makeDirectory(output1);
 output2=output1 + File.separator + outFolder
 File.makeDirectory(output2);
+
+run("Bio-Formats Macro Extensions");
 
 processFolder(input);
 
@@ -36,15 +38,26 @@ function processFile(input, file) {
 	// Leave the print statements until things work, then remove them.
 	setBatchMode(true);
 
-	if(matches(file, ".*"+acq+".*")) {
+	if(matches(file, AcqPattern)) {
 		print(file);
-		run("Bio-Formats Importer", "open=["+input + File.separator + file +"]");
+		Ext.openImagePlus(input + File.separator + file);
+		/*Ext.getPlanePositionX(stage_x , 0); 
+		Ext.getPlanePositionY(stage_y , 0);
+		print(stage_x);
+		print(stage_y);
+		Ext.getPixelsPhysicalSizeZ(sizeZ); 
+		print(sizeZ);
+		Ext.close();
+		
+		Ext.getMetadataValue("DisplaySetting|Channel|Name", value);
+		print(value);
 		name=File.nameWithoutExtension;
 		namesplit= split(name, "_");
 		shortname= namesplit[2]+"-"+namesplit[3]+"-"+namesplit[8];
 		run("Z Project...", "projection=[Max Intensity]");
 		saveAs("Tiff", output2 + "/MAX_" + shortname + ".tif");
 		close('*');
+		*/
 	}
 }
 

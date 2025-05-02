@@ -41,8 +41,8 @@ close();
 //get common file names
 list = getFileList(input);
 list = Array.sort(list);
-endIndex=indexOf(list[1],"_AS_");
-commonName=substring(list[1],0,endIndex);
+endIndex=indexOf(list[0],"_AS_");
+commonName=substring(list[0],0,endIndex);
 
 run("Images to Stack", "use");
 saveAs("tiff", output+"/"+commonName+"_RGB_Stack"+".tiff");

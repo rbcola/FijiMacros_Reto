@@ -5,16 +5,12 @@
 
 #@ File (label = "Input directory", style = "directory") input
 #@ String (label = "File suffix", value = ".vsi") suffix
-#@ String (label = "channels string", value = "640nm_775em, 640nm, 561nm, 514nm_555em") acq
-#@ String (label = "geneseq name", value = "geneseq01") outFolder
+#@ String (label = "File subset regex", value = ".*Sl[2,3].*") REpattern
+//#@ String (label = "geneseq name", value = "geneseq01") outFolder
 
 
 // See also Process_Folder.py for a version of this code
 // in the Python scripting language.
-output1 = input + File.separator + "MAXprojected"
-File.makeDirectory(output1);
-output2=output1 + File.separator + outFolder
-File.makeDirectory(output2);
 
 processFolder(input);
 
@@ -36,18 +32,15 @@ function processFile(input, file) {
 	// Leave the print statements until things work, then remove them.
 	setBatchMode(true);
 
-	if(matches(file, ".*"+acq+".*")) {
+	if(matches(file, REpattern)) {
 		print(file);
-		run("Bio-Formats Importer", "open=["+input + File.separator + file +"]");
+		run("Bio-Formats Importer", "open=["+input + File.separator + file +"] color_mode=Composite rois_import=[ROI manager] view=Hyperstack stack_order=XYCZT use_virtual_stack series_1");
 		name=File.nameWithoutExtension;
-		namesplit= split(name, "_");
-		shortname= namesplit[2]+"-"+namesplit[3]+"-"+namesplit[8];
 		run("Z Project...", "projection=[Max Intensity]");
-		saveAs("Tiff", output2 + "/MAX_" + shortname + ".tif");
+		saveAs("Tiff", input + "/MAX_" + name + ".tif");
 		close('*');
 	}
 }
 
 print("Done\n");
-print("Your MAX-Z projected files are in: " + output2 + ".\n");
-print("Move on to synchronize your local processed folder (within /data/Reto/BARseqTransfer) with the folder on the cluster.");
+print("Your MAX-Z projected files are in: " + input + ".\n");
