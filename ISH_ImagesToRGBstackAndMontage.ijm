@@ -5,6 +5,8 @@
 #@ File (label = "Input directory", style = "directory") input
 #@ File (label = "Output directory", style = "directory") output
 #@ String (label = "File suffix", value = ".tif") suffix
+#@ Boolean(label="ScalingDown Montage?") ScaleDown
+#@ Double(value=0.2) ScaleFactor
 
 
 // See also Process_Folder.py for a version of this code
@@ -46,7 +48,13 @@ commonName=substring(list[0],0,endIndex);
 
 run("Images to Stack", "use");
 saveAs("tiff", output+"/"+commonName+"_RGB_Stack"+".tiff");
-run("Make Montage...", "scale=1 font=30 label");
-saveAs("tiff", output+"/"+commonName+"_RGB_Montage"+".tiff");
+if(ScaleDown == 1){
+	run("Make Montage...", "scale="+ScaleFactor+" font="+ScaleFactor*30+" label");
+	saveAs("tiff", output+"/"+commonName+"_RGB_Montage_"+1/ScaleFactor+"xScaleDown.tiff");
+} else {
+	run("Make Montage...", "scale=1 font=30 label");
+	saveAs("tiff", output+"/"+commonName+"_RGB_Montage"+".tiff");
+}
+
 close("*");
 print("Done!");
